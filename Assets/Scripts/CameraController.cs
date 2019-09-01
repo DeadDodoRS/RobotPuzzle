@@ -2,19 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class CameraController : MBSingleton<CameraController>
 {
-    #region Singleton
-    private static CameraController gameController;
-
-    public static CameraController Instance()
-    {
-        if (gameController == null)
-            gameController = FindObjectOfType<CameraController>();
-
-        return gameController;
-    }
-    #endregion
 
     [SerializeField] private float transitionDuration = 2.5f;
     [SerializeField] private float deltaXInGameMode = 1.5f;

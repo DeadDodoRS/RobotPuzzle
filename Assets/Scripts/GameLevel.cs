@@ -6,5 +6,4 @@ public class GameLevel : MonoBehaviour {
 
     public Transform StartPoint;
     public string Name;
-
 }

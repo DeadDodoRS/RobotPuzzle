@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum AudioClips { Click, BackClick, OnComplite, OnFail, OnEnter }
 
-public class AudioManager : MonoBehaviour {
+public class AudioManager : MBSingleton<AudioManager> {
 
     public AudioClip OnClick;
     public AudioClip OnBackClick;
@@ -15,18 +15,6 @@ public class AudioManager : MonoBehaviour {
     public AudioClip Background;
 
     private AudioSource source;
-
-    #region Singleton
-    private static AudioManager audioController;
-
-    public static AudioManager Instance()
-    {
-        if (audioController == null)
-            audioController = FindObjectOfType<AudioManager>();
-
-        return audioController;
-    }
-    #endregion
 
     void Awake () {
         source = GetComponent<AudioSource>();

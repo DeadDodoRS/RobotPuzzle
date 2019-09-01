@@ -3,21 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameController : MonoBehaviour {
-
+public class GameController : MBSingleton<GameController>
+{
     [SerializeField] public Character Player;
-
-    #region Singleton
-    private static GameController gameController;
-
-    public static GameController Instance()
-    {
-        if (gameController == null)
-            gameController = FindObjectOfType<GameController>();
-
-        return gameController;
-    }
-    #endregion
+    public Action<GameLevel> LevelChange;
 
     public bool IsGameRunning = false;
     public bool IsCommandsListRunning = false;
@@ -33,6 +22,11 @@ public class GameController : MonoBehaviour {
 
     private CharacterCommand runningCommand;
     private bool CommandsRunning;
+
+    private void Awake()
+    {
+        ChangeLevel(true, false);
+    }
 
     public void StartLevel(bool isNextLevel)
     {
@@ -57,14 +51,8 @@ public class GameController : MonoBehaviour {
         Levels[CurrentLevel].gameObject.SetActive(true);
         Player.transform.position = Levels[CurrentLevel].StartPoint.position;
         Player.transform.rotation = Levels[CurrentLevel].StartPoint.rotation;
-    }
 
-    public bool CurrentLevelIsUnlocked()
-    {
-        if (CurrentLevel == 0 || CurrentLevel == 3)
-            return true;
-
-        return false;
+        LevelChange?.Invoke(Levels[CurrentLevel]);
     }
 
     public void StartCommands()
@@ -124,7 +112,7 @@ public class GameController : MonoBehaviour {
 
     private void LevelComplite()
     {
-        LevelCompliteAction();
+        LevelCompleteAction();
     }
 
     private void GameOver()
@@ -142,6 +130,26 @@ public class GameController : MonoBehaviour {
     private void OnTriggerEnter(Collider other)
     {
         EndLevel();
+    }
+
+
+    public void LevelCompleteAction()
+    {
+        StartCoroutine(WaitChange());
+    }
+
+    IEnumerator WaitChange()
+    {
+        yield return new WaitForSeconds(1f);
+        ChangeLevel(true);
+    }
+
+    public void ChangeLevel(bool isNextLevel, bool withEffect = true)
+    {
+        if (withEffect)
+            AudioManager.Instance().Play(AudioClips.Click);
+
+        StartLevel(isNextLevel);
     }
 
 }
