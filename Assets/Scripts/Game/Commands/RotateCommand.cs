@@ -1,14 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 
-
+public enum TurnArguments
+{
+    Left,
+    Right,
+}
 
 public class RotateCommand : CharacterCommand {
 
-    private RotateSides rotateSide;
+    private TurnArguments rotateSide;
 
-    public RotateCommand(RotateSides side) : base ()
+    public RotateCommand(Character implementator, TurnArguments side) : base (implementator)
     {
         rotateSide = side;
     }
@@ -21,9 +23,9 @@ public class RotateCommand : CharacterCommand {
     public override void Undo()
     {
         //TO-DO another moveside
-        if (rotateSide == RotateSides.LEFT)
-            Character.Rotate(RotateSides.RIGHT, this);
+        if (rotateSide == TurnArguments.Left)
+            Character.Rotate(TurnArguments.Right, this);
         else
-            Character.Rotate(RotateSides.LEFT, this);
+            Character.Rotate(TurnArguments.Left, this);
     }
 }

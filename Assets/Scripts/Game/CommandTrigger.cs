@@ -16,16 +16,16 @@ public class CommandTrigger : MonoBehaviour {
             if (isGameOver)
             {
                 AudioManager.Instance().Play(AudioClips.OnFail);
-                GameController.Instance().EndLevel();
+                GameController.Instance().FinishLevel();
                 return;
             }
 
-            character.EndCommand();
+            character.StopRunning();
 
             if (isFinal)
             {
                 AudioManager.Instance().Play(AudioClips.OnComplite);
-                GameController.Instance().EndLevel(true);
+                GameController.Instance().FinishLevel(true);
             }
 
             if (!isFinal && !isGameOver)

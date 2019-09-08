@@ -21,8 +21,8 @@ namespace UI
             base.Open();
             _goToGame.onClick.AddListener(StartGame);
 
-            _prevLevel.onClick.AddListener(() => GameController.Instance().ChangeLevel(false, true));
-            _nextLevel.onClick.AddListener(() => GameController.Instance().ChangeLevel(true, true));
+            _prevLevel.onClick.AddListener(() => GameController.Instance().SetLevel(GameController.Instance().GetNearestLevel(false)));
+            _nextLevel.onClick.AddListener(() => GameController.Instance().SetLevel(GameController.Instance().GetNearestLevel(true)));
             GameController.Instance().LevelChange += OnChangeLevel;
         }
 

@@ -30,7 +30,7 @@ namespace UI
             GameController.Instance().GameOverAction += GameOverAction;
 
             _addCommand.onClick.AddListener(AddCommand);
-            _runCommands.onClick.AddListener(OnRunGame);
+            _runCommands.onClick.AddListener(RunCommands);
             _clearAllCode.onClick.AddListener(ClearInput);
             _toMainMenu.onClick.AddListener(ReturnToMainMenu);
         }
@@ -42,7 +42,7 @@ namespace UI
             GameController.Instance().GameOverAction -= GameOverAction;
 
             _addCommand.onClick.RemoveListener(AddCommand);
-            _runCommands.onClick.RemoveListener(OnRunGame);
+            _runCommands.onClick.RemoveListener(RunCommands);
             _clearAllCode.onClick.RemoveListener(ClearInput);
             _toMainMenu.onClick.RemoveListener(ReturnToMainMenu);
         }
@@ -79,12 +79,12 @@ namespace UI
             }
         }
 
-        public void OnRunGame()
+        public void RunCommands()
         {
             AudioManager.Instance().Play(AudioClips.Click);
 
             foreach (TMP_InputField field in _inputCommands)
-                GameController.Instance().AddNewCommand(field.text);
+                GameController.Instance().CommandsController.AddNewCommand(field.text);
 
             GameController.Instance().StartCommands();
         }

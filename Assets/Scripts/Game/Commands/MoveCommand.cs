@@ -6,7 +6,7 @@ public class MoveCommand : CharacterCommand
 {
     private MoveSides moveSide;
 
-    public MoveCommand(MoveSides sides) : base ()
+    public MoveCommand(Character implementator, MoveSides sides) : base (implementator)
     {
         moveSide = sides;
     }

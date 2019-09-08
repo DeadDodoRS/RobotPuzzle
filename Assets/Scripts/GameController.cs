@@ -6,150 +6,82 @@ using UnityEngine;
 public class GameController : MBSingleton<GameController>
 {
     [SerializeField] public Character Player;
+    [SerializeField] private GameLevel[] Levels;
+    public CommandsController CommandsController;
+
     public Action<GameLevel> LevelChange;
-
-    public bool IsGameRunning = false;
-    public bool IsCommandsListRunning = false;
-    public int CurrentLevel { get; set; } = -1;
-
     public Action LevelCompliteAction;
     public Action GameOverAction;
 
-    public Queue<CharacterCommand> CommandList { get; set; } = new Queue<CharacterCommand>();
-    public GameLevel[] Levels;
-
-    public string CurrentLevelName { get { return Levels[CurrentLevel].Name; } }
-
-    private CharacterCommand runningCommand;
-    private bool CommandsRunning;
+    public int CurrentLevel { get; private set; } = -1;
+    public string CurrentLevelName => Levels[CurrentLevel].Name;
 
     private void Awake()
     {
-        ChangeLevel(true, false);
+        SetLevel(0);
+        CommandsController = new CommandsController(Player);
     }
 
-    public void StartLevel(bool isNextLevel)
+    public int GetNearestLevel(bool isNext)
     {
-        if (CurrentLevel > -1)
+        return isNext ? (CurrentLevel == Levels.Length - 1 ? 0 : CurrentLevel + 1)
+                      : (CurrentLevel == 0 ? Levels.Length - 1 : CurrentLevel - 1);
+    }
+
+    public void StartCommands()
+    {
+        CommandsController.StartCommands();
+    }
+
+    private void FixedUpdate()
+    {
+        if (CommandsController.CommandsRunning)
+            CommandsController.RunCommands();
+    }
+
+    public void FinishLevel(bool isSuccess = false)
+    {
+        if (isSuccess)
+            LevelComplite();
+        else
+            LevelFail();
+    }
+
+    private void LevelComplite()
+    {
+        StartCoroutine(ChangeLevelDelay());
+    }
+
+    private IEnumerator ChangeLevelDelay()
+    {
+        yield return new WaitForSeconds(1f);
+        SetLevel(GetNearestLevel(true));
+        AudioManager.Instance().Play(AudioClips.Click);
+    }
+
+    private void LevelFail()
+    {
+        Player.StopRunning();
+
+        Vector3 spawnPosition = Levels[CurrentLevel].StartPoint.position;
+        Player.transform.rotation = Levels[CurrentLevel].StartPoint.rotation;
+
+        Player.transform.position = new Vector3(spawnPosition.x, spawnPosition.y + 3, spawnPosition.z);
+        CommandsController.Clear();
+
+        GameOverAction();
+    }
+
+    public void SetLevel(int levelIndex)
+    {
+        if (CurrentLevel >= 0)
             Levels[CurrentLevel].gameObject.SetActive(false);
 
-        if (isNextLevel)
-        {
-            if (CurrentLevel == Levels.Length - 1)
-                CurrentLevel = 0;
-            else
-                CurrentLevel += 1;
-        }
-        else
-        {
-            if (CurrentLevel == 0)
-                CurrentLevel = Levels.Length - 1;
-            else
-                CurrentLevel -= 1;
-        }
-
+        CurrentLevel = levelIndex;
         Levels[CurrentLevel].gameObject.SetActive(true);
         Player.transform.position = Levels[CurrentLevel].StartPoint.position;
         Player.transform.rotation = Levels[CurrentLevel].StartPoint.rotation;
 
         LevelChange?.Invoke(Levels[CurrentLevel]);
     }
-
-    public void StartCommands()
-    {
-        CommandsRunning = true;
-    }
-
-    public void AddNewCommand(string command)
-    {
-        foreach (Commands com in Enum.GetValues(typeof(Commands)))
-        {
-            if (command == com.ToString())
-            {
-                switch (com)
-                {
-                    case (Commands.Forward): CommandList.Enqueue(new MoveCommand(MoveSides.FORWARD)); break;
-                    case (Commands.Backward): CommandList.Enqueue(new MoveCommand(MoveSides.BACKWARD)); break;
-                    case (Commands.Turn_left): CommandList.Enqueue(new RotateCommand(RotateSides.LEFT)); break;
-                    case (Commands.Turn_right): CommandList.Enqueue(new RotateCommand(RotateSides.RIGHT)); break;
-                }
-
-                break;
-            }
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (CommandsRunning)
-            RunCommands();
-    }
-
-    private void RunCommands()
-    {
-        if (runningCommand != null && runningCommand.isRunning)
-            return;
-
-        if (CommandList.Count == 0)
-        {
-            CommandsRunning = false;
-            return;
-        }
-
-        runningCommand = CommandList.Dequeue();
-        runningCommand.Execute();
-    }
-
-    public void EndLevel(bool isWin = false)
-    {
-        IsGameRunning = false;
-
-        if (isWin)
-            LevelComplite();
-        else
-            GameOver();
-    }
-
-    private void LevelComplite()
-    {
-        LevelCompleteAction();
-    }
-
-    private void GameOver()
-    {
-        Vector3 restartPos = Levels[CurrentLevel].StartPoint.position;
-        Player.EndCommand();
-
-        Player.transform.rotation = Levels[CurrentLevel].StartPoint.rotation;
-        Player.transform.position = new Vector3(restartPos.x, restartPos.y + 3, restartPos.z);
-        CommandList = new Queue<CharacterCommand>();
-
-        GameOverAction();
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        EndLevel();
-    }
-
-
-    public void LevelCompleteAction()
-    {
-        StartCoroutine(WaitChange());
-    }
-
-    IEnumerator WaitChange()
-    {
-        yield return new WaitForSeconds(1f);
-        ChangeLevel(true);
-    }
-
-    public void ChangeLevel(bool isNextLevel, bool withEffect = true)
-    {
-        if (withEffect)
-            AudioManager.Instance().Play(AudioClips.Click);
-
-        StartLevel(isNextLevel);
-    }
-
 }

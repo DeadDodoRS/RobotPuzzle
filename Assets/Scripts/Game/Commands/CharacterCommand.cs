@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Commands
+public enum CommandsMethods
 {
     Forward,
     Backward,
-    Turn_left,
-    Turn_right,
+    Turn,
 }
 
 public class CharacterCommand
@@ -15,9 +14,9 @@ public class CharacterCommand
     protected Character Character { get; private set; }
     public bool isRunning { get; set; } = false;
 
-    protected CharacterCommand()
+    protected CharacterCommand(Character implementator)
     {
-        Character = GameController.Instance().Player;
+        Character = implementator;
         isRunning = true;
     }
 

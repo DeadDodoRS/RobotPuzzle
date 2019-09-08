@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum RotateSides { LEFT, RIGHT }
 public enum MoveSides { FORWARD, BACKWARD }
 
 public class Character : MonoBehaviour
@@ -36,11 +35,11 @@ public class Character : MonoBehaviour
             characterMoveForce = -speed;
     }
 
-    public void Rotate(RotateSides side, CharacterCommand command)
+    public void Rotate(TurnArguments side, CharacterCommand command)
     {
         currentCommand = command;
 
-        if (side == RotateSides.RIGHT)
+        if (side == TurnArguments.Right)
             StartCoroutine(RotateCharacter(Vector3.up * 90, rotateSpeed));
         else
             StartCoroutine(RotateCharacter(Vector3.up * -90, rotateSpeed));
@@ -56,10 +55,10 @@ public class Character : MonoBehaviour
             yield return null;
         }
 
-        EndCommand();
+        StopRunning();
     }
 
-    public void EndCommand()
+    public void StopRunning()
     {
         if (currentCommand is MoveCommand)
             characterMoveForce = 0;
