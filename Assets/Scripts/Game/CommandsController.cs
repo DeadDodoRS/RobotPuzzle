@@ -1,49 +1,85 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+
 public class CommandsController
 {
     public Queue<CharacterCommand> CommandList { get; set; } = new Queue<CharacterCommand>();
     public bool CommandsRunning { get; private set; }
 
+    private List<CommandsMethods> _allCommands;
     private CharacterCommand _runningCommand;
     private Character _implementator;
+
+    private int currentCommandIndex;
+    private List<string> stringCommandList;
 
     public CommandsController(Character implementator)
     {
         _implementator = implementator;
+        _allCommands = Enum.GetValues(typeof(CommandsMethods)).Cast<CommandsMethods>().ToList();
     }
 
-    public void AddNewCommand(string command)
+    public void SetCommandsList(List<string> commandList)
+    {
+        stringCommandList = commandList;
+
+        for (currentCommandIndex = 0; currentCommandIndex < commandList.Count; currentCommandIndex++)
+        {
+            var command = GetCommand(commandList[currentCommandIndex]);
+            if (command != null)
+                CommandList.Enqueue(command);
+
+        }
+    }
+
+    private CharacterCommand GetCommand(string command)
     {
         string[] arguments = null;
         string methodName = GetMethodSingature(command, ref arguments);
 
-        foreach (CommandsMethods com in Enum.GetValues(typeof(CommandsMethods)))
+        CommandsMethods commandEnum = _allCommands.First(com => com.ToString() == methodName);
+
+        switch (commandEnum)
         {
-            if (methodName == com.ToString())
-            {
-                switch (com)
+            case (CommandsMethods.Forward): return new MoveCommand(_implementator, MoveSides.FORWARD);
+            case (CommandsMethods.Backward): return new MoveCommand(_implementator, MoveSides.BACKWARD);
+            case (CommandsMethods.Turn):
                 {
-                    case (CommandsMethods.Forward): CommandList.Enqueue(new MoveCommand(_implementator, MoveSides.FORWARD)); return;
-                    case (CommandsMethods.Backward): CommandList.Enqueue(new MoveCommand(_implementator, MoveSides.BACKWARD)); return;
-                    case (CommandsMethods.Turn):
-                        {
-                            if (arguments.Length == 0)
-                                return;
+                    if (arguments.Length == 0)
+                        return null;
 
-                            var turnSide = arguments[0].ToLower();
+                    var turnSide = arguments[0].ToLower();
 
-                            if (turnSide == TurnArguments.Right.ToString().ToLower())
-                                CommandList.Enqueue(new RotateCommand(_implementator, TurnArguments.Right));
-                            else if (turnSide == TurnArguments.Right.ToString().ToLower())
-                                CommandList.Enqueue(new RotateCommand(_implementator, TurnArguments.Left));
-                            return;
-                        }
+                    if (turnSide == TurnArguments.Right.ToString().ToLower())
+                        return new RotateCommand(_implementator, TurnArguments.Right);
+                    else if (turnSide == TurnArguments.Left.ToString().ToLower())
+                        return new RotateCommand(_implementator, TurnArguments.Left);
+                    return null;
                 }
+            case (CommandsMethods.Do):
+                {
+                    if (arguments.Length == 0)
+                        return null;
 
-                break;
-            }
+                    int count = Convert.ToInt32(arguments[0]);
+
+                    var listOfDoCommand = new List<CharacterCommand>();
+
+                    currentCommandIndex++;
+                    while (stringCommandList[currentCommandIndex] != "End()" && currentCommandIndex < stringCommandList.Count)
+                    {
+                        var com = GetCommand(stringCommandList[currentCommandIndex]);
+                        currentCommandIndex++;
+                        if (com != null)
+                            listOfDoCommand.Add(com);
+                    }
+
+                    return new DoCommand(_implementator, listOfDoCommand, count);
+                }
         }
+
+        return null;
     }
 
     private string GetMethodSingature(string command, ref string[] arguments)
