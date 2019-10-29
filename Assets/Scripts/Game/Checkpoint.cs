@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CommandTrigger : MonoBehaviour {
-
+public class Checkpoint : MonoBehaviour 
+{
     [SerializeField] private bool isFinal;
     [SerializeField] private bool isGameOver;
 

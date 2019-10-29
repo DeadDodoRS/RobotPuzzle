@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveCommand : CharacterCommand
+public class MoveCommand : BaseCommand
 {
     private MoveSides moveSide;
 

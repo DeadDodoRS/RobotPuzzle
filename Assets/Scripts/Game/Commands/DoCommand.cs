@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class DoCommand : CharacterCommand
+public class DoCommand : BaseCommand
 {
-    private List<CharacterCommand> _commandsList;
+    private List<BaseCommand> _commandsList;
     private int _repeatCount;
     private int _currentCommandIndex;
 
-    public DoCommand(Character implementator, List<CharacterCommand> commands, int repeatCount) : base(implementator)
+    public DoCommand(Character implementator, List<BaseCommand> commands, int repeatCount) : base(implementator)
     {
         _commandsList = commands.ToList();
         _repeatCount = repeatCount;

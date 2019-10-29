@@ -6,14 +6,13 @@ public enum MoveSides { FORWARD, BACKWARD }
 
 public class Character : MonoBehaviour
 {
-
     [SerializeField] private float speed = 1.5f;
     private float characterMoveForce;
 
     [SerializeField] private float rotateSpeed = 0.8f;
 
     private Rigidbody rbody;
-    private CharacterCommand currentCommand;
+    private BaseCommand currentCommand;
 
     private void Awake()
     {
@@ -25,7 +24,7 @@ public class Character : MonoBehaviour
         rbody.MovePosition(rbody.position + transform.forward * Time.deltaTime * characterMoveForce);
     }
 
-    public void Move(MoveSides side, CharacterCommand command)
+    public void Move(MoveSides side, BaseCommand command)
     {
         currentCommand = command;
 
@@ -35,7 +34,7 @@ public class Character : MonoBehaviour
             characterMoveForce = -speed;
     }
 
-    public void Rotate(TurnArguments side, CharacterCommand command)
+    public void Rotate(TurnArguments side, BaseCommand command)
     {
         currentCommand = command;
 

@@ -5,20 +5,20 @@ using UnityEngine;
 
 public enum CommandsMethods
 {
-    Forward,
-    Backward,
-    Turn,
-    Do,
-    While
+    Forward = 1,
+    Backward = 2,
+    Turn = 3,
+    Do = 4,
+    While = 5,
 }
 
-public class CharacterCommand
+public class BaseCommand
 {
     protected Character Character { get; private set; }
     public bool isRunning { get; set; } = false;
     public Action OnCommandEnd;
 
-    protected CharacterCommand(Character implementator)
+    protected BaseCommand(Character implementator)
     {
         Character = implementator;
         isRunning = true;

@@ -6,7 +6,7 @@ public enum TurnArguments
     Right,
 }
 
-public class RotateCommand : CharacterCommand {
+public class RotateCommand : BaseCommand {
 
     private TurnArguments rotateSide;
 
