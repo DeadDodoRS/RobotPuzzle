@@ -8,12 +8,11 @@ public enum WhileConditions
     NotCheckpoint
 }
 
-public class WhileCommand : BaseCommand
+public class WhileCommand : CompositeCommand
 {
-    private List<BaseCommand> _commandsList;
     private int _currentCommandIndex;
 
-    public WhileCommand(Character implementator, List<BaseCommand> commands, WhileConditions condition) : base(implementator)
+    public WhileCommand(Character implementator, List<BaseCommand> commands, WhileConditions condition) : base(implementator, commands)
     {
         _commandsList = commands.ToList();
         _currentCommandIndex = -1;

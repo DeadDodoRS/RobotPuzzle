@@ -2,37 +2,87 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UI {
+namespace UI
+{
     public class CommandControllerUI : MonoBehaviour
     {
         [SerializeField] private RectTransform _commandsContainer;
 
-        private List<CommandUI> _inputCommands = new List<CommandUI>();
+        public List<CommandUI> _firstLevelCommands = new List<CommandUI>();
+        public CommandUI _defaultCommand;
 
         private void Awake()
         {
-            _inputCommands.Add(_commandsContainer.GetChild(0).GetComponent<CommandUI>());
-            _inputCommands[0].gameObject.SetActive(false);
-            _inputCommands[0].Initialize(this);
+            InitializeDefaultCommand();
         }
 
-        public void AddCommand()
+        private void InitializeDefaultCommand()
+        {
+            //_defaultCommand = _commandsContainer.GetChild(0).GetComponent<CommandUI>();
+            //_defaultCommand.gameObject.SetActive(false);
+
+            //_firstLevelCommands.Add(_defaultCommand);
+        }
+
+        public CommandUI AddCommand(Transform parentTransform = null, CommandUI parentCommand = null)
         {
             AudioManager.Instance().Play(AudioClips.Click);
 
-            foreach (var inputField in _inputCommands)
-                if (!inputField.gameObject.activeSelf)
-                {
-                    inputField.gameObject.SetActive(true);
-                    return;
-                }
+            CommandUI newCommand = FindDisableCommand(_firstLevelCommands);
 
-            var defaultInput = _commandsContainer.transform.GetChild(0);
-            CommandUI newInput = Instantiate(defaultInput).GetComponent<CommandUI>();
+            if (newCommand != null)
+            {
+                //If get disable command need remove it from parent command
+                if (newCommand.ParentCommand == null)
+                    _firstLevelCommands.Remove(newCommand);
+                else
+                    newCommand.ParentCommand.NestedCommands.Remove(newCommand);
+                
+                newCommand.gameObject.SetActive(true);
+            }
+            else
+            {
+                newCommand = SpawnNewCommand();
+            }
 
-            newInput.transform.parent = _commandsContainer.transform;
-            newInput.Initialize(this);
-            _inputCommands.Add(newInput);
+            if (parentTransform == null)
+            {
+                newCommand.transform.parent = transform;
+
+                newCommand.Initialize(this, null);
+                _firstLevelCommands.Add(newCommand);
+            }
+            else
+            {
+                newCommand.transform.parent = parentTransform;
+
+                newCommand.Initialize(this, parentCommand);
+                parentCommand.NestedCommands.Add(newCommand);
+            }
+
+            return newCommand;
+        }
+
+        private CommandUI FindDisableCommand(List<CommandUI> commandLevel)
+        {
+            foreach (var command in commandLevel)
+            {
+                if (!command.gameObject.activeSelf)
+                    return command;
+
+                var anw = FindDisableCommand(command.NestedCommands);
+
+                if (anw != null)
+                    return anw;
+            }
+
+            return null;
+        }
+
+        private CommandUI SpawnNewCommand()
+        {
+            CommandUI newInput = Instantiate(_defaultCommand.gameObject).GetComponent<CommandUI>();
+            return newInput;
         }
 
         public void EditCommand(CommandUI commandUI, string newTextValue)
@@ -41,7 +91,14 @@ namespace UI {
             if (GameController.Instance().CommandsController.TryGetCommand(newTextValue, out command))
             {
                 commandUI.ErrorWave.gameObject.SetActive(false);
-            } else
+
+                if (commandUI.HasNestedCommands && (command is DoCommand || command is WhileCommand))
+                {
+                    commandUI.MakeParent();
+                }
+
+            }
+            else
             {
                 commandUI.ErrorWave.gameObject.SetActive(true);
             }
@@ -49,15 +106,17 @@ namespace UI {
 
         public void DeleteCommand(CommandUI command)
         {
-            _inputCommands.Remove(command);
-            _inputCommands.Add(command);
+            if (command.ParentCommand != null)
+                command.ParentCommand.NestedCommands.Remove(command);
+            else
+                _firstLevelCommands.Remove(command);
 
             command.gameObject.SetActive(false);
         }
 
         public void ClearInput()
         {
-            foreach (CommandUI input in _inputCommands)
+            foreach (CommandUI input in _firstLevelCommands)
             {
                 input.Clear();
                 input.gameObject.SetActive(false);

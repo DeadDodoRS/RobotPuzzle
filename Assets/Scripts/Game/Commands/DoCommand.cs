@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class DoCommand : BaseCommand
+public class DoCommand : CompositeCommand
 {
-    private List<BaseCommand> _commandsList;
     private int _repeatCount;
     private int _currentCommandIndex;
 
-    public DoCommand(Character implementator, List<BaseCommand> commands, int repeatCount) : base(implementator)
+    public DoCommand(Character implementator, List<BaseCommand> commands, int repeatCount) : base(implementator, commands)
     {
-        _commandsList = commands.ToList();
         _repeatCount = repeatCount;
     }
 

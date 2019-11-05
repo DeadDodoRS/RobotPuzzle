@@ -52,7 +52,7 @@ namespace UI
 
             GameController.Instance().GameOverAction += _commandsController.ClearInput;
 
-            _addCommand.onClick.AddListener(_commandsController.AddCommand);
+            _addCommand.onClick.AddListener(() => _commandsController.AddCommand());
             _runCommands.onClick.AddListener(RunCommands);
             _clearAllCode.onClick.AddListener(_commandsController.ClearInput);
             _toMainMenu.onClick.AddListener(ReturnToMainMenu);
@@ -75,7 +75,8 @@ namespace UI
         public void RunCommands()
         {
             AudioManager.Instance().Play(AudioClips.Click);
-            GameController.Instance().StartCommands();
+
+            GameController.Instance().CommandsController.SetCommandsList(_commandsController._firstLevelCommands);
         }
 
         public void ReturnToMainMenu()

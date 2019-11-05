@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UI;
 
 public class CommandsController
 {
@@ -20,26 +21,80 @@ public class CommandsController
         _allCommands = Enum.GetValues(typeof(CommandsMethods)).Cast<CommandsMethods>().ToList();
     }
 
+    public void RunCommands()
+    {
+        if (_runningCommand != null && _runningCommand.isRunning)
+            return;
+
+        if (CommandList.Count == 0)
+        {
+            CommandsRunning = false;
+            return;
+        }
+
+        _runningCommand = CommandList.Dequeue();
+        _runningCommand.Execute();
+    }
+
+    public void StartCommands()
+    {
+        CommandsRunning = true;
+    }
+
+    //public void SetCommandsList(List<string> commandList)
+    //{
+    //    stringCommandList = commandList;
+
+    //    for (currentCommandIndex = 0; currentCommandIndex < commandList.Count; currentCommandIndex++)
+    //    {
+    //        var command = GetSimpleCommand(commandList[currentCommandIndex]);
+    //        if (command != null)
+    //            CommandList.Enqueue(command);
+
+    //    }
+    //}
+
+    public void SetCommandsList(List<CommandUI> commandList)
+    {
+        List<BaseCommand> allCommands = new List<BaseCommand>();
+
+        foreach (var container in commandList)
+        {
+            allCommands.Add(GetRealCommand(container));
+        }
+
+        
+    }
+
+    private BaseCommand GetRealCommand(CommandUI commandUI)
+    {
+        BaseCommand command;
+
+        GameController.Instance().CommandsController.TryGetCommand(commandUI.CommandText, out command);
+
+        if (command is CompositeCommand)
+        {
+            List<BaseCommand> nestedCommands = new List<BaseCommand>();
+
+            foreach (var com in commandUI.NestedCommands)
+                nestedCommands.Add(GetRealCommand(com));
+
+            (command as CompositeCommand).SetSubCommand(nestedCommands);
+            return command;
+        }
+        else
+        {
+            return command;
+        }
+    }
+
     public bool TryGetCommand(string commandString, out BaseCommand command)
     {
         command = GetSimpleCommand(commandString);
 
-        if(command != null)
+        if (command != null)
             return true;
         return false;
-    }
-
-    public void SetCommandsList(List<string> commandList)
-    {
-        stringCommandList = commandList;
-
-        for (currentCommandIndex = 0; currentCommandIndex < commandList.Count; currentCommandIndex++)
-        {
-            var command = GetSimpleCommand(commandList[currentCommandIndex]);
-            if (command != null)
-                CommandList.Enqueue(command);
-
-        }
     }
 
     private BaseCommand GetSimpleCommand(string command)
@@ -48,6 +103,12 @@ public class CommandsController
         string methodName = GetMethodSingature(command, ref arguments);
 
         CommandsMethods commandEnum = _allCommands.FirstOrDefault(com => com.ToString() == methodName);
+
+        foreach(var t in _allCommands)
+        {
+            if (Equals(methodName, t.ToString()))
+                commandEnum = t;
+        }
 
         if (commandEnum == 0)
             return null;
@@ -71,15 +132,15 @@ public class CommandsController
                 }
             case (CommandsMethods.Do):
                 {
-                    if (arguments.Length == 0)
+                    int count = 0;
+                    if (arguments == null || arguments.Length == 0 || !int.TryParse(arguments[0], out count))
                         return null;
 
-                    int count = Convert.ToInt32(arguments[0]);
                     return new DoCommand(_implementator, null, count);
                 }
             case (CommandsMethods.While):
                 {
-                    if (arguments.Length == 0)
+                    if (arguments == null || arguments.Length == 0)
                         return null;
 
 
@@ -90,64 +151,6 @@ public class CommandsController
 
         return null;
     }
-
-    //private BaseCommand GetCommand(string command)
-    //{
-    //    string[] arguments = null;
-    //    string methodName = GetMethodSingature(command, ref arguments);
-
-    //    CommandsMethods commandEnum = _allCommands.First(com => com.ToString() == methodName);
-
-    //    switch (commandEnum)
-    //    {
-    //        case (CommandsMethods.Forward): return new MoveCommand(_implementator, MoveSides.FORWARD);
-    //        case (CommandsMethods.Backward): return new MoveCommand(_implementator, MoveSides.BACKWARD);
-    //        case (CommandsMethods.Turn):
-    //            {
-    //                if (arguments.Length == 0)
-    //                    return null;
-
-    //                var turnSide = arguments[0].ToLower();
-
-    //                if (turnSide == TurnArguments.Right.ToString().ToLower())
-    //                    return new RotateCommand(_implementator, TurnArguments.Right);
-    //                else if (turnSide == TurnArguments.Left.ToString().ToLower())
-    //                    return new RotateCommand(_implementator, TurnArguments.Left);
-    //                return null;
-    //            }
-    //        case (CommandsMethods.Do):
-    //            {
-    //                if (arguments.Length == 0)
-    //                    return null;
-
-    //                int count = Convert.ToInt32(arguments[0]);
-
-    //                var listOfDoCommand = new List<BaseCommand>();
-
-    //                currentCommandIndex++;
-    //                while (stringCommandList[currentCommandIndex] != "End()" && currentCommandIndex < stringCommandList.Count)
-    //                {
-    //                    var com = GetCommand(stringCommandList[currentCommandIndex]);
-    //                    currentCommandIndex++;
-    //                    if (com != null)
-    //                        listOfDoCommand.Add(com);
-    //                }
-
-    //                return new DoCommand(_implementator, listOfDoCommand, count);
-    //            }
-    //        case (CommandsMethods.While):
-    //            {
-    //                if (arguments.Length == 0)
-    //                    return null;
-
-
-
-    //                break;
-    //            }
-    //    }
-
-    //    return null;
-    //}
 
     private string GetMethodSingature(string command, ref string[] arguments)
     {
@@ -162,26 +165,6 @@ public class CommandsController
             .Replace(" ", string.Empty)
             .Split(',');
         return command.Substring(0, methodParametersStart);
-    }
-
-    public void RunCommands()
-    {
-        if (_runningCommand != null && _runningCommand.isRunning)
-            return;
-
-        if (CommandList.Count == 0)
-        {
-            CommandsRunning = false;
-            return;
-        }
-
-        _runningCommand = CommandList.Dequeue();
-        _runningCommand.Execute();
-    }
-
-    public void StartCommands()
-    {
-        CommandsRunning = true;
     }
 
     public void Clear()
