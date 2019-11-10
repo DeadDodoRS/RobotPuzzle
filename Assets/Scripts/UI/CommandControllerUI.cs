@@ -88,7 +88,7 @@ namespace UI
         public void EditCommand(CommandUI commandUI, string newTextValue)
         {
             BaseCommand command;
-            if (GameController.Instance().CommandsController.TryGetCommand(newTextValue, out command))
+            if (GameController.Instance().CommandsController.TryGetSimpleCommand(newTextValue, out command))
             {
                 commandUI.ErrorWave.gameObject.SetActive(false);
 

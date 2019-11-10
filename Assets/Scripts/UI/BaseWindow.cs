@@ -11,6 +11,11 @@ namespace UI
             gameObject.SetActive(true);
         }
 
+        public virtual void SetWindowConfig(BaseWindowConfig config)
+        {
+
+        }
+
         public virtual void Close()
         {
             gameObject.SetActive(false);

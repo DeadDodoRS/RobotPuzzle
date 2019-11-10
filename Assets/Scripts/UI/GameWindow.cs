@@ -74,9 +74,32 @@ namespace UI
 
         public void RunCommands()
         {
-            AudioManager.Instance().Play(AudioClips.Click);
+            errorList = new List<CommandErrorStruct>();
 
-            GameController.Instance().CommandsController.SetCommandsList(_commandsController._firstLevelCommands);
+            AudioManager.Instance().Play(AudioClips.Click);
+            GameController.Instance().CommandsController.CommandStartError += WriteError;
+            GameController.Instance().CommandsController.TryStartCommandList(_commandsController._firstLevelCommands);
+            GameController.Instance().CommandsController.CommandStartError -= WriteError;
+
+            foreach(var t in GameController.Instance().CommandsController.CommandList)
+            {
+                Debug.Log($"Command: {t.GetType()}");
+            }
+
+            if (errorList.Count > 0)
+            {
+                UIController.Instance().SetWindow(WindowsEnum.Error, config: new ErrorWindowConfig() { errors = errorList });
+            }
+        }
+
+        private List<CommandErrorStruct> errorList;
+
+        private void WriteError(ErrorType type)
+        {
+            errorList.Add(new CommandErrorStruct() { 
+                Type = type,
+                LineNumber = GameController.Instance().CommandsController._currentCommandLine
+            });
         }
 
         public void ReturnToMainMenu()

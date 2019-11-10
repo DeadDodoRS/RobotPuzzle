@@ -33,9 +33,9 @@ public class GameController : MBSingleton<GameController>
         CommandsController.StartCommands();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        if (CommandsController.CommandsRunning)
+        if (CommandsController.IsCommandsRunning)
             CommandsController.RunCommands();
     }
 
