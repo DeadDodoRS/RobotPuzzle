@@ -7,9 +7,8 @@ public class CompositeCommand : BaseCommand
 {
     protected List<BaseCommand> _commandsList;
 
-    public CompositeCommand(Character implementator, List<BaseCommand> commands) : base(implementator)
+    public CompositeCommand(Character implementator) : base(implementator)
     {
-        _commandsList = commands?.ToList();
     }
 
     public void SetSubCommand(List<BaseCommand> commandsList)

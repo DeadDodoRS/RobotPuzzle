@@ -5,16 +5,15 @@ using UnityEngine;
 
 public enum WhileConditions
 {
-    NotCheckpoint
+    NotPlate = 1,
 }
 
 public class WhileCommand : CompositeCommand
 {
     private int _currentCommandIndex;
 
-    public WhileCommand(Character implementator, List<BaseCommand> commands, WhileConditions condition) : base(implementator, commands)
+    public WhileCommand(Character implementator, WhileConditions condition) : base(implementator)
     {
-        _commandsList = commands.ToList();
         _currentCommandIndex = -1;
     }
 

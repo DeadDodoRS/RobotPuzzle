@@ -54,6 +54,7 @@ public class Character : MonoBehaviour
             yield return null;
         }
 
+        transform.rotation = toAngle;
         StopRunning();
     }
 

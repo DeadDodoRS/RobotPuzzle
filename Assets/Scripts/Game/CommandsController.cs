@@ -9,6 +9,8 @@ public class CommandsController
     public bool IsCommandsRunning { get; private set; }
 
     private List<CommandsMethods> _availableCommands;
+    private List<WhileConditions> _allWhileConditions;
+
     private BaseCommand _currentCommand;
     private Character _implementator;
 
@@ -24,6 +26,10 @@ public class CommandsController
 
         _availableCommands = Enum.GetValues(typeof(CommandsMethods))
             .Cast<CommandsMethods>()
+            .ToList();
+
+        _allWhileConditions = Enum.GetValues(typeof(WhileConditions))
+            .Cast<WhileConditions>()
             .ToList();
     }
 
@@ -114,10 +120,16 @@ public class CommandsController
 
         switch (commandEnum)
         {
-            case (CommandsMethods.Forward): 
+            case (CommandsMethods.Forward):
+                if (arguments == null || arguments.Length != 1 || arguments[0] != string.Empty)
+                    return false;
+
                 returnCommand = new MoveCommand(_implementator, MoveSides.FORWARD);
                 return true;
-            case (CommandsMethods.Backward): 
+            case (CommandsMethods.Backward):
+                if (arguments == null || arguments.Length != 1 || arguments[0] != string.Empty)
+                    return false;
+
                 returnCommand = new MoveCommand(_implementator, MoveSides.BACKWARD);
                 return true;
             case (CommandsMethods.Turn):
@@ -131,7 +143,7 @@ public class CommandsController
                         returnCommand = new RotateCommand(_implementator, TurnArguments.Right);
                     else if (turnSide == TurnArguments.Left.ToString().ToLower())
                         returnCommand = new RotateCommand(_implementator, TurnArguments.Left);
-                    return false;
+                    return true;
                 }
             case (CommandsMethods.Do):
                 {
@@ -139,7 +151,7 @@ public class CommandsController
                     if (arguments == null || arguments.Length == 0 || !int.TryParse(arguments[0], out count))
                         return false;
 
-                    returnCommand = new DoCommand(_implementator, null, count);
+                    returnCommand = new DoCommand(_implementator, count);
                     return true;
                 }
             case (CommandsMethods.While):
@@ -147,9 +159,13 @@ public class CommandsController
                     if (arguments == null || arguments.Length == 0)
                         return false;
 
+                    WhileConditions argument = _allWhileConditions.FirstOrDefault(com => com.ToString() == arguments[0]);
 
+                    if (argument == 0)
+                        return false;
 
-                    break;
+                    returnCommand = new WhileCommand(_implementator, argument);
+                    return true;
                 }
         }
 

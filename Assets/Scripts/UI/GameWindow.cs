@@ -21,6 +21,7 @@ namespace UI
         [SerializeField] private RectTransform _containerHelper;
         [SerializeField] private RectTransform _containerCommandExamples;
 
+        private List<CommandErrorStruct> errorList;
         public virtual void Awake()
         {
             _containerCommandExamples.transform.GetChild(0).GetComponent<CommandExampleUI>()
@@ -35,7 +36,7 @@ namespace UI
                 new[] {"(int)count"});
 
             CreateNewCommandExample().Initialize(CommandsMethods.While.ToString(), 
-                new[] { WhileConditions.NotCheckpoint.ToString()});
+                new[] { WhileConditions.NotPlate.ToString()});
         }
 
         private CommandExampleUI CreateNewCommandExample()
@@ -77,6 +78,7 @@ namespace UI
             errorList = new List<CommandErrorStruct>();
 
             AudioManager.Instance().Play(AudioClips.Click);
+
             GameController.Instance().CommandsController.CommandStartError += WriteError;
             GameController.Instance().CommandsController.TryStartCommandList(_commandsController._firstLevelCommands);
             GameController.Instance().CommandsController.CommandStartError -= WriteError;
@@ -89,10 +91,11 @@ namespace UI
             if (errorList.Count > 0)
             {
                 UIController.Instance().SetWindow(WindowsEnum.Error, config: new ErrorWindowConfig() { errors = errorList });
+                return;
             }
-        }
 
-        private List<CommandErrorStruct> errorList;
+            GameController.Instance().StartCommands();
+        }
 
         private void WriteError(ErrorType type)
         {

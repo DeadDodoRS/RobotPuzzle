@@ -6,9 +6,10 @@ using UnityEngine;
 public class DoCommand : CompositeCommand
 {
     private int _repeatCount;
+    private int _currentRepeatCount;
     private int _currentCommandIndex;
 
-    public DoCommand(Character implementator, List<BaseCommand> commands, int repeatCount) : base(implementator, commands)
+    public DoCommand(Character implementator, int repeatCount) : base(implementator)
     {
         _repeatCount = repeatCount;
     }
@@ -16,27 +17,30 @@ public class DoCommand : CompositeCommand
     public override void Execute()
     {
         _currentCommandIndex = 0;
-        _repeatCount--;
+        _currentRepeatCount = _repeatCount;
 
         ExecuteNextCommand();
     }
 
     private void ExecuteNextCommand()
     {
-        if(_currentCommandIndex != 0)
+        if (_currentCommandIndex != 0)
+        {
             _commandsList[_currentCommandIndex - 1].OnCommandEnd -= ExecuteNextCommand;
+        }
 
         if (_currentCommandIndex >= _commandsList.Count)
         {
             //Check end of cycle
-            if (_repeatCount == 0)
+            if (_currentRepeatCount == 0)
             {
+                _currentCommandIndex = 0;
                 CommandEnd();
                 return;
             }
             else
             {
-                _repeatCount--;
+                _currentRepeatCount--;
                 _currentCommandIndex = 0;
             }
         }
