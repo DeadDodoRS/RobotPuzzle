@@ -43,7 +43,7 @@ namespace UI
         {
             var defaultExample = _containerCommandExamples.transform.GetChild(0);
             CommandExampleUI newExample = Instantiate(defaultExample).GetComponent<CommandExampleUI>();
-            newExample.transform.parent = _containerCommandExamples.transform;
+            newExample.transform.SetParent(_containerCommandExamples.transform, false);
             return newExample;
         }
 

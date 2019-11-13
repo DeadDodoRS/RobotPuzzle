@@ -9279,6 +9279,7 @@ GameObject:
   - component: {fileID: 1408373768}
   - component: {fileID: 1408373767}
   - component: {fileID: 1408373769}
+  - component: {fileID: 1408373770}
   m_Layer: 5
   m_Name: Container_Args
   m_TagString: Untagged
@@ -9367,6 +9368,20 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!114 &1408373770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408373765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &1465499142
 GameObject:
   m_ObjectHideFlags: 0
@@ -9599,7 +9614,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1697200704}
   - component: {fileID: 1697200706}
-  - component: {fileID: 1697200705}
   - component: {fileID: 1697200707}
   m_Layer: 5
   m_Name: Container_CommandExample
@@ -9629,20 +9643,6 @@ RectTransform:
   m_AnchoredPosition: {x: 225, y: -103.305}
   m_SizeDelta: {x: 418, y: 174.61}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1697200705
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1697200703}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!114 &1697200706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9663,7 +9663,7 @@ MonoBehaviour:
   m_ChildAlignment: 5
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
@@ -10112,7 +10112,7 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
 --- !u!114 &1858167806

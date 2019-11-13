@@ -47,7 +47,7 @@ namespace UI
 
             if (parentTransform == null)
             {
-                newCommand.transform.parent = transform;
+                newCommand.transform.SetParent(transform, false);
 
                 newCommand.Initialize(this, null);
                 _firstLevelCommands.Add(newCommand);
