@@ -41,11 +41,13 @@ namespace UI
         private void OnEnable()
         {
             _buttonCopy.onClick.AddListener(() => 
-            { 
+            {
+#if UNITY_EDITOR
                 if(_args != null && _args.Length > 0)
                     EditorGUIUtility.systemCopyBuffer = $"{_methodName}({_args[0]})";
                 else
                     EditorGUIUtility.systemCopyBuffer = _methodName;
+#endif
             });
         }
 
