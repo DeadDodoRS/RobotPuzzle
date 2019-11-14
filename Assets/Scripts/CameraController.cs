@@ -6,18 +6,18 @@ public class CameraController : MBSingleton<CameraController>
 {
 
     [SerializeField] private float transitionDuration = 2.5f;
-    [SerializeField] private float deltaXInGameMode = 1.5f;
+    [SerializeField] private Vector3 InGameCameraDelta;
     private Vector3 target;
 
     public void SetGameMode()
     {
-        target = new Vector3(transform.position.x - deltaXInGameMode, transform.position.y, transform.position.z);
+        target = transform.position + InGameCameraDelta;
         StartCoroutine(Transition());
     }
 
     public void SetMenuMode()
     {
-        target = new Vector3(transform.position.x + deltaXInGameMode, transform.position.y, transform.position.z);
+        target = transform.position - InGameCameraDelta;
         StartCoroutine(Transition());
     }
 
@@ -32,5 +32,6 @@ public class CameraController : MBSingleton<CameraController>
             yield return 0;
         }
 
+        transform.position = target;
     }
 }
