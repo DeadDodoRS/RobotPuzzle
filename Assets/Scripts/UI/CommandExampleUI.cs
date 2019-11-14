@@ -42,11 +42,24 @@ namespace UI
         {
             _buttonCopy.onClick.AddListener(() => 
             {
-#if UNITY_EDITOR
-                if(_args != null && _args.Length > 0)
-                    EditorGUIUtility.systemCopyBuffer = $"{_methodName}({_args[0]})";
+                string textToCopy;
+
+                if (_args != null && _args.Length > 0)
+                    textToCopy = $"{_methodName}({_args[0]})";
                 else
-                    EditorGUIUtility.systemCopyBuffer = _methodName;
+                    textToCopy = $"{_methodName}()";
+
+#if UNITY_EDITOR
+                EditorGUIUtility.systemCopyBuffer = textToCopy;
+#endif
+
+#if UNITY_ANDROID
+                TextEditor editor = new TextEditor
+                {
+                    text = textToCopy
+                };
+                editor.SelectAll();
+                editor.Copy();
 #endif
             });
         }
